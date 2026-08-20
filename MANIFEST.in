@@ -1,0 +1,7 @@
+include CHANGELOG.md
+include CONTRIBUTING.md
+include SECURITY.md
+include requirements.txt
+include irongate.py
+include plc_sim.py
+recursive-include tests *.py
