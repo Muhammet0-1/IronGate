@@ -2,74 +2,70 @@
 
 [![CI](https://github.com/Muhammet0-1/IronGate/actions/workflows/ci.yml/badge.svg)](https://github.com/Muhammet0-1/IronGate/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776AB.svg)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Lisans: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-IronGate Lab is a **localhost-only** Modbus/TCP training environment for studying
-basic ICS/SCADA process monitoring, control-state changes, and fail-safe software
-design. It contains a synthetic water-pressure process, a small PLC simulator, and
-a bounded scenario runner.
+IronGate Lab; temel ICS/SCADA süreç izleme, kontrol durumu değişiklikleri ve arıza emniyetli
+yazılım tasarımı konularını incelemek için yalnızca **localhost üzerinde çalışan** bir Modbus/TCP
+eğitim ortamıdır.
+Sentetik su basıncı süreci, küçük bir PLC simülatörü ve sınırlı bir senaryo çalıştırıcısı içerir.
 
-The project is intentionally a laboratory tool. It does not discover devices,
-target real industrial systems, conceal activity, capture credentials, or implement
-malware behavior.
+Proje bilinçli olarak bir laboratuvar aracıdır. Cihaz keşfetmez, gerçek endüstriyel sistemleri hedef
+almaz, etkinliği gizlemez, kimlik bilgisi toplamaz ve zararlı yazılım davranışı uygulamaz.
 
-## Project story
+## Projenin hikâyesi
 
-The original proof of concept used the IronGate name as a reference to public
-research about a 2016 industrial-control malware sample. That early version mixed a
-simulator with an autonomous register-writing script and described the demonstration
-in attack-oriented terms.
+İlk PoC, IronGate adını 2016 tarihli bir endüstriyel kontrol zararlısı hakkındaki kamuya açık
+araştırmalara gönderme olarak kullanıyordu. Bu erken sürüm, bir simülatörü otonom register yazma
+betiğiyle birleştiriyor ve gösterimi saldırı odaklı terimlerle açıklıyordu.
 
-Version 0.2.0 rebuilds the idea as a defensive engineering lab. Connections are
-restricted in code to loopback addresses, observation is the default, write mode is
-finite and requires an exact endpoint confirmation, and only the synthetic valve
-register is writable. Anti-analysis and evasion behavior are deliberately absent.
+0.2.0 sürümü bu fikri savunma amaçlı bir mühendislik laboratuvarı olarak yeniden kurar. Bağlantılar
+kod içinde loopback adresleriyle sınırlandırılmıştır, varsayılan davranış gözlemdir, yazma modu sonlu
+ve tam endpoint onayına bağlıdır; yalnız sentetik vana için kullanılan `1` numaralı register
+yazılabilir. Analizden kaçınma ve gizlenme davranışları özellikle dahil edilmemiştir.
 
-## Safety boundaries
+## Güvenlik sınırları
 
-- Both client and server accept only `localhost`, `127.0.0.0/8`, or `::1`.
-- There is no flag that disables the loopback restriction.
-- The simulator uses an unprivileged port (`5020` by default).
-- `observe` never writes registers.
-- `scenario` is observation-only unless `--apply` is supplied.
-- Write mode also requires `--confirm-lab-target` to match the exact endpoint.
-- Every run has a bounded iteration count (maximum 1,000).
-- Only register `1`, the synthetic valve command, accepts writes.
-- A valve opened by the runner is closed during cleanup when possible.
-- No real network scan, persistence, process injection, anti-VM, or stealth feature
-  is included.
+- İstemci ve sunucu yalnızca `localhost`, `127.0.0.0/8` veya `::1` kabul eder.
+- Loopback sınırlamasını kapatan bir seçenek yoktur.
+- Simülatör varsayılan olarak ayrıcalıksız `5020` portunu kullanır.
+- `observe` hiçbir zaman register yazmaz.
+- `scenario`, `--apply` verilmedikçe yalnızca gözlem yapar.
+- Yazma modu ayrıca `--confirm-lab-target` değerinin tam endpoint ile eşleşmesini ister.
+- Her çalıştırmanın iterasyon sayısı sınırlıdır; üst sınır 1.000'dir.
+- Yalnızca sentetik vana komutuna ait `1` numaralı register yazılabilir.
+- Çalıştırıcının açtığı vana, mümkün olduğunda temizleme işlemi sırasında kapatılır.
+- Gerçek ağ taraması, kalıcılık, işlem enjeksiyonu, anti-VM veya gizlenme özelliği yoktur.
 
-These controls reduce accidental misuse; they do not turn Modbus/TCP into a secure
-industrial protocol. Never point similar tooling at equipment you do not own and
-have explicit permission to test.
+Bu kontroller kazara kötüye kullanım riskini azaltır; Modbus/TCP protokolünü güvenli hâle getirmez.
+Benzer araçları hiçbir zaman sahibi olmadığınız ve açık test izniniz bulunmayan ekipmanlara yöneltmeyin.
 
-## Architecture
+## Mimari
 
 ```text
 irongate-lab scenario/observe
             |
             v
-   validated loopback endpoint
+   doğrulanmış loopback endpoint
             |
             v
-   PyModbus gateway ----> localhost Modbus/TCP server
+   PyModbus geçidi ----> localhost Modbus/TCP sunucusu
                                     |
                                     v
-                           thread-safe register bank
+                           thread-safe register bankası
                                     |
                                     v
-                         synthetic pressure process
+                           sentetik basınç süreci
 ```
 
-The domain model and scenario policy are independent from PyModbus, so almost all
-tests run without opening a socket.
+Etki alanı modeli ve senaryo politikası PyModbus'tan bağımsızdır; bu nedenle testlerin neredeyse
+tamamı soket açmadan çalışır.
 
-## Requirements
+## Gereksinimler
 
-- Python 3.10 or newer
-- PyModbus 3.11.x (pinned to one minor API line)
+- Python 3.10 veya üzeri
+- PyModbus 3.11.x (tek bir minor API serisine sabitlenmiştir)
 
-## Installation
+## Kurulum
 
 ```bash
 git clone https://github.com/Muhammet0-1/IronGate.git
@@ -81,27 +77,27 @@ python -m pip install --upgrade pip
 python -m pip install -e .
 ```
 
-For development tools:
+Geliştirme araçları için:
 
 ```bash
 python -m pip install -e '.[dev]'
 ```
 
-## Quick start
+## Hızlı başlangıç
 
-Start the synthetic PLC in one terminal:
+Bir terminalde sentetik PLC'yi başlatın:
 
 ```bash
 irongate-lab simulate
 ```
 
-Read five snapshots from another terminal (no writes):
+Başka bir terminalden beş durum görüntüsü okuyun; bu komut yazma yapmaz:
 
 ```bash
 irongate-lab observe --iterations 5
 ```
 
-Run a bounded local write demonstration:
+Sınırlı yerel yazma gösterimini çalıştırın:
 
 ```bash
 irongate-lab scenario \
@@ -112,30 +108,30 @@ irongate-lab scenario \
   --confirm-lab-target 127.0.0.1:5020
 ```
 
-Machine-readable output is available with `--json`:
+Makine tarafından okunabilir çıktı için `--json` kullanılabilir:
 
 ```bash
 irongate-lab observe --iterations 3 --json
 ```
 
-The legacy filenames remain as safe compatibility shims:
+Eski dosya adları güvenli uyumluluk sarmalayıcıları olarak korunur:
 
 ```bash
 python plc_sim.py
 python irongate.py --iterations 5
 ```
 
-## Register map
+## Register haritası
 
-| Address | Name | Access | Values |
+| Adres | Ad | Erişim | Değerler |
 | ---: | --- | --- | --- |
-| `0` | Pressure | Read only | Synthetic value from `0` to `150` |
-| `1` | Valve command | Read/write | `0` closed, `1` open |
-| `2` | Alarm | Read only | `0` normal, `1` high pressure |
+| `0` | Basınç | Salt okunur | `0`–`150` arasında sentetik değer |
+| `1` | Vana komutu | Okuma/yazma | `0` kapalı, `1` açık |
+| `2` | Alarm | Salt okunur | `0` normal, `1` yüksek basınç |
 
-The map is deliberately small and is not intended to represent any vendor device.
+Harita bilinçli olarak küçüktür ve herhangi bir üreticinin gerçek cihazını temsil etmez.
 
-## CLI reference
+## CLI referansı
 
 ```bash
 irongate-lab --help
@@ -144,10 +140,10 @@ irongate-lab observe --help
 irongate-lab scenario --help
 ```
 
-Invalid hosts, privileged ports, non-finite timing values, invalid device IDs, and
-unconfirmed writes fail with a clear configuration error.
+Geçersiz host değerleri, ayrıcalıklı portlar, sonlu olmayan zaman değerleri, geçersiz cihaz
+kimlikleri ve onaylanmamış yazma işlemleri açık bir yapılandırma hatasıyla durdurulur.
 
-## Development and verification
+## Geliştirme ve doğrulama
 
 ```bash
 ruff check .
@@ -156,16 +152,15 @@ pytest
 python -m build
 ```
 
-The GitHub Actions matrix runs those checks on Python 3.10, 3.11, 3.12, and 3.13.
-Tests use fake transports and deterministic disturbances; they do not connect to
-external systems.
+GitHub Actions matrisi bu kontrolleri Python 3.10, 3.11, 3.12 ve 3.13 üzerinde çalıştırır. Testler
+sahte taşıma katmanları ve deterministik bozucu etkiler kullanır; harici sistemlere bağlanmaz.
 
-## Responsible use
+## Sorumlu kullanım
 
-Use this project only as a local educational simulator or as a code-review exercise.
-For security concerns about the project itself, see [SECURITY.md](SECURITY.md). For
-contribution guidance, see [CONTRIBUTING.md](CONTRIBUTING.md).
+Bu projeyi yalnızca yerel bir eğitim simülatörü veya kod inceleme çalışması olarak kullanın. Projeyle
+ilgili güvenlik bildirimleri için [SECURITY.md](SECURITY.md), katkı rehberi için
+[CONTRIBUTING.md](CONTRIBUTING.md) dosyasına bakın.
 
-## License
+## Lisans
 
-Released under the [MIT License](LICENSE).
+[MIT Lisansı](LICENSE) ile yayımlanmıştır.
